@@ -11,8 +11,9 @@ docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.e
 2. Then, create a Python script. We'll use two external libraries: `elasticsearch`, for interacting with Elasticsearch, and `click`, for building command line interfaces. Install them using `pip`:
 
 ```bash
-pip install elasticsearch click
+pip install click
 pip3 install 'elasticsearch<7.14.0'
+pip install tensorflow tensorflow_text tensorflow_hub universal_sentence_encoder
 ```
 
 3. Now let's build the script. Create a Python file named `search_script.py`, and use the following script:
