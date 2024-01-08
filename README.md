@@ -17,9 +17,7 @@ pyenv global 3.11
 ```
 
 ```bash
-pip install click
-pip3 install 'elasticsearch<7.14.0'
-pip install tensorflow tensorflow_text tensorflow_hub universal_sentence_encoder
+pip install click 'elasticsearch<7.14.0' tensorflow tensorflow_text tensorflow_hub
 ```
 
 3. Now let's build the script. Create a Python file named `search_script.py`, and use the following script:
