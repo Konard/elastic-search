@@ -1,6 +1,7 @@
 import click
 import tensorflow_hub as hub
 from elasticsearch import Elasticsearch
+import json
 
 es = Elasticsearch(['localhost:9200'])
 
@@ -38,7 +39,7 @@ def search(search_string):
             'script_score': {
                 'query': {'match_all': {}},
                 'script': {
-                    'source': "cosineSimilarity(params.query_vector, doc['text_vector']) + 1.0",
+                    'source': "cosineSimilarity(params.query_vector, 'text_vector') + 1.0",
                     'params': {'query_vector': search_vector}
                 }
             }
@@ -58,10 +59,17 @@ def search(search_string):
     # }
 
 
-    res = es.search(index='text_index', body=body)
-    click.echo("Search results:")
-    for doc in res['hits']['hits']:
-        click.echo(f"{doc['_id']} {doc['_score']}: {doc['_source']['text']}")
+    try:
+        res = es.search(index='text_index', body=body)
+        click.echo("Search results:")
+        for doc in res['hits']['hits']:
+            click.echo(f"{doc['_id']} {doc['_score']}: {doc['_source']['text']}")
+    except Exception as inst:
+        print(type(inst))
+        print(json.dumps(inst.args, indent=4))
+        print(json.dumps(inst, indent=4))
+
+
 
 cli.add_command(index)
 cli.add_command(search)
