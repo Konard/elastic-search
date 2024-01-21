@@ -20,12 +20,6 @@ pyenv global 3.11
 pip install click 'elasticsearch<7.14.0' tensorflow tensorflow_text tensorflow_hub
 ```
 
-3. Now let's build the script. Create a Python file named `search_script.py`, and use the following script:
-
-
-
-4. Direct your command-line interface to the folder where you've saved the `search_script.py` file. 
-
 5. Run
 
 ```bash
@@ -38,6 +32,12 @@ and follow the prompt to index a string. The script will store your string in an
 
 ```bash
 python search.py search
+```
+
+Clear elastic search index
+
+```bash
+curl -X DELETE 'http://localhost:9200/_all'
 ```
 
 and following the prompt to enter a search query. The script will retrieve and print any stored strings that match the query.
