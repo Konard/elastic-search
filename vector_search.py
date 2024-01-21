@@ -13,6 +13,21 @@ def cli():
     pass
 
 @click.command()
+# @click.option('--str', 'input_str', prompt=True)
+# def create(input_str):
+def create():
+    index = 'text_index'
+    # settings = {}
+    # mappings = {}
+    body = {
+        "settings": {},
+        "mappings": { "properties": { "text_vector": { "type": "dense_vector", "dims": 3 } } }
+    }
+    es.indices.create(index=index, body=body)
+
+    click.echo(f"Index {index} is created with settings {json.dumps(body, indent=4)}")
+
+@click.command()
 @click.option('--str', 'input_str', prompt=True)
 def index(input_str):
     """Index a string in Elasticsearch."""
@@ -20,6 +35,7 @@ def index(input_str):
     text_embedding = [4.2, 3.4, -0.2]
 
     body = {'text': input_str, 'text_vector': text_embedding}
+    
     res = es.index(index='text_index', body=body)
     click.echo(f"Indexed {input_str} with id {res['_id']}")
 
@@ -67,10 +83,10 @@ def search(search_string):
     except Exception as inst:
         print(type(inst))
         print(json.dumps(inst.args, indent=4))
-        print(json.dumps(inst, indent=4))
+        # print(json.dumps(inst, indent=4))
 
 
-
+cli.add_command(create)
 cli.add_command(index)
 cli.add_command(search)
 
