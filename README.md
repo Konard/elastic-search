@@ -10,7 +10,7 @@ docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.e
 
 2. Then, create a Python script. We'll use two external libraries: `elasticsearch`, for interacting with Elasticsearch, and `click`, for building command line interfaces. Install them using `pip`:
 
-For GitPod (or if you have 3.12+ installed):
+For GitPod (or if you have 3.12+ python installed):
 ```
 pyenv install 3.11
 pyenv global 3.11
