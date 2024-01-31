@@ -12,12 +12,8 @@ def cli():
     pass
 
 @click.command()
-# @click.option('--str', 'input_str', prompt=True)
-# def create(input_str):
 def create():
     index = 'text_index'
-    # settings = {}
-    # mappings = {}
     body = {
         "settings": {},
         "mappings": { "properties": { "text_vector": { "type": "dense_vector", "dims": 384 } } }
@@ -52,25 +48,13 @@ def search(search_string):
             'script_score': {
                 'query': {'match_all': {}},
                 'script': {
+                    # "source": "doc['my_vector'].size() == 0 ? 0 : cosineSimilarity(params.query_vector, 'text_vector') + 1.0"
                     'source': "cosineSimilarity(params.query_vector, 'text_vector') + 1.0",
                     'params': {'query_vector': search_vector}
                 }
             }
         }
     }
-
-    # doc['text_vector'].size()
-
-    # cosineSimilarity(params.query_vector, 'text_vector')
-    # cosineSimilarity(params.query_vector, doc['text_vector'])
-
-    # "source": "doc['my_vector'].size() == 0 ? 0 : cosineSimilarity(params.queryVector, 'my_vector')"
-
-    # "script": {
-    #     "source": "cosineSimilarity(params.query_vector, 'abs_emb') + 1.0",
-    #     "params": {"query_vector": query_vector}
-    # }
-
 
     try:
         res = es.search(index='text_index', body=body)
@@ -80,7 +64,6 @@ def search(search_string):
     except Exception as inst:
         print(type(inst))
         print(json.dumps(inst.args, indent=4))
-        # print(json.dumps(inst, indent=4))
 
 
 cli.add_command(create)
