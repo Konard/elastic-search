@@ -1,3 +1,5 @@
+[![Gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/konard/elastic-search)
+
 # elastic-search
 
 To create a script in Python that loads an array of strings to Elasticsearch Docker container and then allow user to search from CLI, follow these steps. But before starting make sure Docker and Elasticsearch are installed on your machine.  
