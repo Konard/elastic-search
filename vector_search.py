@@ -1,12 +1,11 @@
 import click
-import tensorflow_hub as hub
+from sentence_transformers import SentenceTransformer
 from elasticsearch import Elasticsearch
 import json
 
 es = Elasticsearch(['localhost:9200'])
 
-# Load the Universal Sentence Encoder module from TensorFlow Hub.
-embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
 
 @click.group()
 def cli():
@@ -21,7 +20,7 @@ def create():
     # mappings = {}
     body = {
         "settings": {},
-        "mappings": { "properties": { "text_vector": { "type": "dense_vector", "dims": 512 } } }
+        "mappings": { "properties": { "text_vector": { "type": "dense_vector", "dims": 384 } } }
     }
     es.indices.create(index=index, body=body)
 
@@ -31,7 +30,7 @@ def create():
 @click.option('--str', 'input_str', prompt=True)
 def index(input_str):
     """Index a string in Elasticsearch."""
-    text_embedding = embed([input_str])[0].numpy().tolist()
+    text_embedding = model.encode([input_str])[0]
 
     body = {'text': input_str, 'text_vector': text_embedding}
     
@@ -42,7 +41,7 @@ def index(input_str):
 @click.option('--search', 'search_string', prompt=True)
 def search(search_string):
     """Find strings semantically similar to the search query in Elasticsearch."""
-    search_vector = embed([search_string])[0].numpy().tolist()
+    search_vector = model.encode([search_string])[0]
 
     print(type(search_vector))
     print(type(search_vector[0]))
