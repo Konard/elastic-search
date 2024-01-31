@@ -25,7 +25,11 @@ pip install click 'elasticsearch<7.14.0' tensorflow tensorflow_text tensorflow_h
 5. Run
 
 ```bash
-python search.py index
+python vector_search.py create
+```
+
+```bash
+python vector_search.py index --str "dog"
 ```
 
 and follow the prompt to index a string. The script will store your string in an Elasticsearch index called `text_index`.
@@ -33,7 +37,7 @@ and follow the prompt to index a string. The script will store your string in an
 6. Search for the string by running
 
 ```bash
-python search.py search
+python vector_search.py search --search "dog"
 ```
 
 Clear elastic search index
