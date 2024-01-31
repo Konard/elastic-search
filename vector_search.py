@@ -39,16 +39,12 @@ def search(search_string):
     """Find strings semantically similar to the search query in Elasticsearch."""
     search_vector = model.encode([search_string])[0]
 
-    print(type(search_vector))
-    print(type(search_vector[0]))
-    print(f"{search_vector}")
-
     body = {
         'query': {
             'script_score': {
                 'query': {'match_all': {}},
                 'script': {
-                    # "source": "doc['my_vector'].size() == 0 ? 0 : cosineSimilarity(params.query_vector, 'text_vector') + 1.0"
+                    # "source": "doc['text_vector'].size() == 0 ? 0 : cosineSimilarity(params.query_vector, 'text_vector') + 1.0"
                     'source': "cosineSimilarity(params.query_vector, 'text_vector') + 1.0",
                     'params': {'query_vector': search_vector}
                 }
