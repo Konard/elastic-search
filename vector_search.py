@@ -21,7 +21,7 @@ def create():
     # mappings = {}
     body = {
         "settings": {},
-        "mappings": { "properties": { "text_vector": { "type": "dense_vector", "dims": 3 } } }
+        "mappings": { "properties": { "text_vector": { "type": "dense_vector", "dims": 512 } } }
     }
     es.indices.create(index=index, body=body)
 
@@ -31,8 +31,7 @@ def create():
 @click.option('--str', 'input_str', prompt=True)
 def index(input_str):
     """Index a string in Elasticsearch."""
-    # text_embedding = embed([input_str])[0].numpy().tolist()
-    text_embedding = [4.2, 3.4, -0.2]
+    text_embedding = embed([input_str])[0].numpy().tolist()
 
     body = {'text': input_str, 'text_vector': text_embedding}
     
@@ -43,8 +42,7 @@ def index(input_str):
 @click.option('--search', 'search_string', prompt=True)
 def search(search_string):
     """Find strings semantically similar to the search query in Elasticsearch."""
-    # search_vector = embed([search_string])[0].numpy().tolist()
-    search_vector = [4.2, 3.4, -0.2]
+    search_vector = embed([search_string])[0].numpy().tolist()
 
     print(type(search_vector))
     print(type(search_vector[0]))

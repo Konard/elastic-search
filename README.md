@@ -14,7 +14,7 @@ docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.e
 
 For GitPod (or if you have 3.12+ python installed):
 ```
-pyenv install 3.11
+pyenv install 3.11 -f
 pyenv global 3.11
 ```
 
