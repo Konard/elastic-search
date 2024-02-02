@@ -31,6 +31,12 @@ python vector_search.py create
 python vector_search.py index --string "dog"
 ```
 
+## Index documents array from json
+
+```bash
+python vector_search.py index_documents --path "articles-filtered-and-truncated.json"
+```
+
 ## Search specific string
 
 ```bash

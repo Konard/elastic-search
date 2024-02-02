@@ -2,6 +2,7 @@ import click
 from sentence_transformers import SentenceTransformer
 from elasticsearch import Elasticsearch
 import json
+import time
 import re
 
 es = Elasticsearch(['localhost:9200'])
@@ -10,12 +11,17 @@ model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniL
 
 space = ' '
 dot = '.'
-whitespace_regex = re.compile(r"\s+")
+whitespace_regex = re.compile(r"[ \t]+")
+split_regex = re.compile(r"\r?\n|\:|\;|\,|\.|\(|\)| против | об | за | о | на | в | или | и | для | либо | - ")
 model_string_limit = 128
 
 def split_string(string):
-    string = whitespace_regex.sub(space, string).strip().lower()
-    sentences = string.split(dot)
+    string = whitespace_regex.sub(space, string).lower()
+    # sentences = string.split(dot)
+    # print(string)
+    sentences = split_regex.split(string)
+    sentences = [sentence.strip() for sentence in sentences if sentence.strip()]
+    # print(sentences)
 
     for sentence in sentences:
         if len(sentence) >= model_string_limit:
@@ -28,6 +34,7 @@ def index_strings(strings):
     text_embeddings = model.encode(strings)
 
     for i, string in enumerate(strings):
+        # print(string)
         text_embedding = text_embeddings[i]
         body = {'text': string, 'text_vector': text_embedding}
         res = es.index(index='text_index', body=body)
@@ -83,6 +90,20 @@ def index(string):
     """Index a string in Elasticsearch."""
     index_string(string)
 
+@click.command(name='index_documents')
+@click.option('--path', 'path', prompt=True)
+def index_documents(path):
+    start_time = time.time()
+
+    with open(path, 'r', encoding='utf-8') as file:
+        documents_dict = json.load(file)
+
+    for document in documents_dict:
+        index_string(document)
+
+    document_embedding_time = time.time() - start_time
+    print(f"Documents indexed in {document_embedding_time} seconds.")
+
 @click.command()
 @click.option('--query', 'query', prompt=True)
 def search(query):
@@ -92,6 +113,7 @@ def search(query):
 
 cli.add_command(create)
 cli.add_command(index)
+cli.add_command(index_documents)
 cli.add_command(search)
 
 if __name__ == "__main__":
