@@ -28,13 +28,13 @@ python vector_search.py create
 ## Index specific string
 
 ```bash
-python vector_search.py index --str "dog"
+python vector_search.py index --string "dog"
 ```
 
 ## Search specific string
 
 ```bash
-python vector_search.py search --search "dog"
+python vector_search.py search --query "dog"
 ```
 
 ## Clear elastic search index
