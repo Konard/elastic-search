@@ -4,20 +4,12 @@
 
 Model used in vector_search: https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 
-A script in Python that loads strings to Elasticsearch Docker container and then allow user to search from CLI. Make sure Docker and pyenv are installed on your machine.
+A script in Python that loads strings to Elasticsearch Docker container and then allow user to search from CLI. Make sure Docker and python are installed on your machine.
 
 ## Install and start the Elasticsearch Docker container
 
 ```bash
 docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.13.1
-```
-
-## Install supported python version
-
-For GitPod (or if you have 3.12+ python installed):
-```
-pyenv install 3.11 -f
-pyenv global 3.11
 ```
 
 ## Install dependencies
