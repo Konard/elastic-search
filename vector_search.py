@@ -26,7 +26,7 @@ def create():
 @click.option('--str', 'input_str', prompt=True)
 def index(input_str):
     """Index a string in Elasticsearch."""
-    text_embedding = model.encode([input_str])[0]
+    text_embedding = model.encode([input_str.lower()])[0]
 
     body = {'text': input_str, 'text_vector': text_embedding}
     
@@ -37,7 +37,7 @@ def index(input_str):
 @click.option('--search', 'search_string', prompt=True)
 def search(search_string):
     """Find strings semantically similar to the search query in Elasticsearch."""
-    search_vector = model.encode([search_string])[0]
+    query_vector = model.encode([search_string.lower()])[0]
 
     body = {
         'query': {
@@ -46,7 +46,7 @@ def search(search_string):
                 'script': {
                     # "source": "doc['text_vector'].size() == 0 ? 0 : cosineSimilarity(params.query_vector, 'text_vector') + 1.0"
                     'source': "cosineSimilarity(params.query_vector, 'text_vector') + 1.0",
-                    'params': {'query_vector': search_vector}
+                    'params': {'query_vector': query_vector}
                 }
             }
         }
