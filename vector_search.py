@@ -108,7 +108,10 @@ def index_documents(path):
 @click.option('--query', 'query', prompt=True)
 def search(query):
     """Find strings semantically similar to the search query in Elasticsearch."""
+    start_time = time.time()
     search_string(query)
+    seatch_time = time.time() - start_time
+    print(f"Searched in {seatch_time} seconds.")
 
 
 cli.add_command(create)
