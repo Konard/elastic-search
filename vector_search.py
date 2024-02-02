@@ -27,18 +27,15 @@ def split_string(string):
 def index_strings(strings):
     text_embeddings = model.encode(strings)
 
-    for text_embedding in text_embeddings:
+    for i, string in enumerate(strings):
+        text_embedding = text_embeddings[i]
         body = {'text': string, 'text_vector': text_embedding}
         res = es.index(index='text_index', body=body)
-        print(f"Indexed {string} with id {res['_id']}.")
+        print(f"Indexed '{string}' with id '{res['_id']}'.")
 
 def index_string(string):
-    text_embedding = model.encode([string.lower()])[0]
-
-    body = {'text': string, 'text_vector': text_embedding}
-    
-    res = es.index(index='text_index', body=body)
-    click.echo(f"Indexed {string} with id {res['_id']}")
+    sentences = split_string(string)
+    index_strings(sentences)
 
 def search_string(query):
     query_embedding = model.encode([query.lower()])[0]
@@ -60,7 +57,7 @@ def search_string(query):
         res = es.search(index='text_index', body=body)
         click.echo("Search results:")
         for doc in res['hits']['hits']:
-            click.echo(f"{doc['_id']} {doc['_score']}: {doc['_source']['text']}")
+            click.echo(f"'{doc['_id']}' {doc['_score']}: {doc['_source']['text']}")
     except Exception as inst:
         print(type(inst))
         print(json.dumps(inst.args, indent=4))
