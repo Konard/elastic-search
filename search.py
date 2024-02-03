@@ -21,169 +21,43 @@ def search(query):
     """Search for a string in Elasticsearch."""
     es = Elasticsearch(['localhost:9200'])
     body = {
-        # 'query': {
-        #     'match': {
-        #         'text': query
-        #     }
-        # }
-        # 'query': {
-        #     'match': {
-        #         'text': {
-        #         'query': query,
-        #         "operator": "and",
-        #         "zero_terms_query": "all",
-        #            "fuzziness": "AUTO",
-        #         #    "zero_terms_query": "all",
-        #         } 
-                
-        #     },
-        # }
-
-        # "query": {
-        #     "bool": {
-        #         "must": {
-        #             "match_all": {}
-        #         },
-        #         "should": [
-        #             { "match": { "text": query }, },
-        #             # { "match": { "name.last": { "query": "banon", "_name": "last" } } }
-        #         ],
-        #     }
-        # },
-
-        'query': {
-            'function_score': {
-                "query": {
-                    "bool": {
-                        "must": {
-                            "match_all": { 'boost': 0 }
-                        },
-                        "should": [
-                            { "match": { "text": query }, },
-                            # { "match": { "name.last": { "query": "banon", "_name": "last" } } }
-                        ],
-                    }
+        "query": {
+            "bool": {
+                "must": {
+                    "match_all": { 'boost': 0 }
                 },
-                'functions': [
-                    # {
-                    #     # 'filter': { 'match_all': {} },
-                    #     # 'random_score': {}, 
-                    #     'weight': 1
-                    # },
-                    # {
-                    #     'function_score': {
-                    #         'query': {
-                    #             'match': {
-                    #                 'text': query
-                    #             }
-                    #         },
-                    #         'weight': 2
-                    #     }
-                    # }
-                    # {
-                    #     'function_score': {
-                    #         'query': {
-                    #             'match': {
-                    #                 'text': query
-                    #             }
-                    #         },
-                    #         'weight': 2
-                    #     }
-                    # }
-
-                    {
-                        # 'filter': { 'match': { 'text': query } },
-                        'script_score': {
-                            # 'query': {'match_all': {}},
-                            'script': {
-                                'source': "_score",
-                            }
-                        },
-                        'weight': 2
+                "should": [
+                    { 
+                        "match": { 
+                            "text": query
+                        }
                     },
-                    
-                    # {
-                    #     'filter': { 'match': { 'text': query } },
-                    #     'weight': 2
-                    # }
+                    {
+                        "match": {
+                            "content": {
+                                "query": query,
+                                "operator": "and"
+                            }
+                        }
+                    },
+                    {
+                        "match_phrase": {
+                            "content": {
+                                "query": query
+                            }
+                        }
+                    }
                 ],
             }
-        }
-
-        # 'query': {
-        #     'function_score': {
-        #         # 'query': { 'match_all': {} },
-        #         'query': {
-        #             'match': {
-        #                 'text': {
-        #                    'query': query,
-        #                    "operator": "and",
-        #                    "zero_terms_query": "all"
-        #                 #    "fuzziness": "AUTO",
-        #                 #    "zero_terms_query": "all",
-        #                 } 
-                        
-        #             },
-        #             # "zero_terms_query": "all",
-        #         },
-        #         # 'boost': '5', 
-        #         # 'functions': [
-        #         #     {
-        #         #         'filter': { 'match_all': {} },
-        #         #         'random_score': {}, 
-        #         #         'weight': 1
-        #         #     },
-        #         #     # {
-        #         #     #     'function_score': {
-        #         #     #         'query': {
-        #         #     #             'match': {
-        #         #     #                 'text': query
-        #         #     #             }
-        #         #     #         },
-        #         #     #         'weight': 2
-        #         #     #     }
-        #         #     # }
-        #         #     # {
-        #         #     #     'function_score': {
-        #         #     #         'query': {
-        #         #     #             'match': {
-        #         #     #                 'text': query
-        #         #     #             }
-        #         #     #         },
-        #         #     #         'weight': 2
-        #         #     #     }
-        #         #     # }
-
-        #         #     # {
-        #         #     #     'filter': { 'match': { 'text': query } },
-        #         #     #     'script_score': {
-        #         #     #         # 'query': {'match_all': {}},
-        #         #     #         'script': {
-        #         #     #             'source': "_score",
-        #         #     #         }
-        #         #     #     },
-        #         #     #     'weight': 1
-        #         #     # },
-                    
-        #         #     # {
-        #         #     #     'filter': { 'match': { 'text': query } },
-        #         #     #     'weight': 2
-        #         #     # }
-        #         # ],
-        #         # 'max_boost': 42,
-        #         # 'score_mode': 'max',
-        #         # 'boost_mode': 'multiply',
-        #         # 'min_score': 42
-        #     }
-        # } 
+        },
     }
 
     
     res = es.search(index='text_index', body=body)
     click.echo("Search results:")
-    click.echo(json.dumps(res, indent=2))
+    # click.echo(json.dumps(res, indent=2))
     for doc in res['hits']['hits']:
-        click.echo(f"{doc['_source']['text']}")
+        click.echo(f"'{doc['_id']}' {doc['_score']}: {doc['_source']['text']}")
 
 cli.add_command(index)
 cli.add_command(search)
