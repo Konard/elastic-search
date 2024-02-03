@@ -23,24 +23,30 @@ pip install -U sentence-transformers
 
 ```bash
 python vector_search.py create
+python combined_search.py create
 ```
 
 ## Index specific string
 
 ```bash
+python search.py index --string "dog"
 python vector_search.py index --string "dog"
+python combined_search.py index --string "dog"
 ```
 
 ## Index documents array from json
 
 ```bash
 python vector_search.py index_documents --path "articles-filtered-and-truncated.json"
+python combined_search.py index_documents --path "articles-filtered-and-truncated.json"
 ```
 
 ## Search specific string
 
 ```bash
+python search.py search --query "dog"
 python vector_search.py search --query "dog"
+python combined_search.py search --query "dog"
 ```
 
 ## Clear elastic search index
