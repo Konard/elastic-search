@@ -11,6 +11,7 @@ model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniL
 
 space = ' '
 dot = '.'
+newline = '\n'
 whitespace_regex = re.compile(r"[ \t]+")
 split_regex = re.compile(r"\r?\n|\:|\;|\,|\.|\(|\)| против | об | за | о | на | в | или | и | для | либо | -[ ]?")
 model_string_limit = 128
@@ -44,7 +45,7 @@ def index_string(string):
     sentences = split_string(string)
     index_strings(sentences)
 
-documents = {}
+documents = []
 sentence_documents = {}
 
 def index_prepared_string(string):
@@ -56,8 +57,9 @@ def prepare_document_strings(string, document_id):
     for sentence in sentences:
         if sentence in sentence_documents:
             document_ids = sentence_documents[sentence]
-            document_ids.append(document_id)
-            sentence_documents[sentence] = document_ids
+            if document_id not in document_ids:
+                document_ids.append(document_id)
+                # sentence_documents[sentence] = document_ids
         else:
             sentence_documents[sentence] = [document_id]
 
@@ -121,7 +123,13 @@ def search_string(query):
         res = es.search(index='text_index', body=body)
         click.echo("Search results:")
         for doc in res['hits']['hits']:
-            click.echo(f"'{doc['_id']}' {doc['_score']}: {doc['_source']['text']}")
+            document_ids = doc['_source']['document_ids']
+            articles = []
+            for document_id in document_ids:
+                article_text = documents[document_id]
+                article = article_text.strip().partition(newline)[0]
+                articles.append(article)
+            click.echo(f"'{doc['_id']}' {doc['_score']}: \n{doc['_source']['text']}\n{articles}")
     except Exception as inst:
         print(type(inst))
         print(json.dumps(inst.args, indent=4))
@@ -167,6 +175,7 @@ def index_documents(path):
 @click.option('--query', 'query', prompt=True)
 def search(query):
     """Find strings semantically similar to the search query in Elasticsearch."""
+
     start_time = time.time()
     search_string(query)
     seatch_time = time.time() - start_time
@@ -177,6 +186,10 @@ cli.add_command(create)
 cli.add_command(index)
 cli.add_command(index_documents)
 cli.add_command(search)
+
+# preload documents for search
+with open("articles-filtered-and-truncated.json", 'r', encoding='utf-8') as file:
+    documents = json.load(file)
 
 if __name__ == "__main__":
     cli()
