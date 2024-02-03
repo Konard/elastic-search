@@ -12,7 +12,7 @@ model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniL
 space = ' '
 dot = '.'
 whitespace_regex = re.compile(r"[ \t]+")
-split_regex = re.compile(r"\r?\n|\:|\;|\,|\.|\(|\)| против | об | за | о | на | в | или | и | для | либо | - ")
+split_regex = re.compile(r"\r?\n|\:|\;|\,|\.|\(|\)| против | об | за | о | на | в | или | и | для | либо | -[ ]?")
 model_string_limit = 128
 
 def split_string(string):
@@ -43,6 +43,35 @@ def index_strings(strings):
 def index_string(string):
     sentences = split_string(string)
     index_strings(sentences)
+
+documents = {}
+sentence_documents = {}
+
+def index_prepared_string(string):
+    sentences = split_string(string)
+    index_strings(sentences)
+
+def prepare_document_strings(string, document_id):
+    sentences = split_string(string)
+    for sentence in sentences:
+        if sentence in sentence_documents:
+            document_ids = sentence_documents[sentence]
+            document_ids.append(document_id)
+            sentence_documents[sentence] = document_ids
+        else:
+            sentence_documents[sentence] = [document_id]
+
+def index_prepared_strings():
+    strings = []
+    items = list(enumerate(sentence_documents.items()))
+    for i, (string, document_ids) in items:
+        strings.append(string)
+    text_embeddings = model.encode(strings)
+    for i, (string, document_ids) in items:
+        text_embedding = text_embeddings[i]
+        body = {'text': string, 'text_vector': text_embedding, 'document_ids': sentence_documents[string]}
+        res = es.index(index='text_index', body=body)
+        print(f"Indexed '{string}' with id '{res['_id']}'.")
 
 def search_string(query):
     query_embedding = model.encode([query.lower()])[0]
@@ -124,10 +153,12 @@ def index_documents(path):
     start_time = time.time()
 
     with open(path, 'r', encoding='utf-8') as file:
-        documents_dict = json.load(file)
-
-    for document in documents_dict:
-        index_string(document)
+        documents = json.load(file)
+    
+    for i, document in enumerate(documents):
+        prepare_document_strings(document, i)
+    
+    index_prepared_strings()
 
     document_embedding_time = time.time() - start_time
     print(f"Documents indexed in {document_embedding_time} seconds.")
